@@ -30,7 +30,7 @@ function prompts (){
             type: "list",
             message: "What would you like to do?",
             name: "question",
-            choices: ["Add departments", "Add roles", "Add employees", "View departments", "View roles", "View employees", "Update employee", "Update roles"]
+            choices: ["Add departments", "Add roles", "Add employees", "View departments", "View roles", "View employees", "Update employee", "Update roles", "Delete department", "Delete role", "Delete employee"]
         }
     ]).then(function(data){
 
@@ -63,8 +63,16 @@ function prompts (){
                 updateEmployeeRole()
                 break;
 
-                case "Update roles":
-                console.log("1")
+                case "Delete department":
+                deleteDepartment()
+                break;
+
+                case "Delete role":
+                deleteRole()
+                break;
+
+                case "Delete employee":
+                deleteEmployee()
                 break;
         }
 
@@ -87,7 +95,7 @@ function addDepartment(){
 
     ]).then(function(response){
 
-        connection.query(`INSERT into department (name) VALUES ("${response.department}")`, function(err, response){
+        connection.query(`INSERT into department (department_name) VALUES ("${response.department}")`, function(err, response){
             if (err) throw err;
 
             console.log("added");
@@ -232,4 +240,65 @@ function updateEmployeeRole(){
             connection.end();
         });
     });
+};
+
+
+function deleteDepartment(){
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the name of the department you would like to remove",
+            name: "departmentName",
+        }
+    ]).then(function(response){
+
+        connection.query(`DELETE FROM department WHERE department_name ="${response.departmentName}"`, function(err, res){
+            if (err) throw err;
+            console.log("{department_name: response.departmentName}");
+            console.log({department_name: response.departmentName});
+            console.log("deleted");
+            connection.end();
+        })
+    })
+
+}
+
+function deleteRole(){
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the name of the role that you would like to remove",
+            name: "roleName",
+        }
+    ]).then(function(response){
+
+        connection.query(`DELETE FROM role WHERE title ="${response.roleName}"`, function(err, res){
+            if (err) throw err;
+            console.log("deleted");
+            connection.end();
+        })
+    })
+
+};
+
+
+function deleteEmployee(){
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the first name of the employee that you would like to remove",
+            name: "employeeName",
+        }
+    ]).then(function(response){
+
+        connection.query(`DELETE FROM employee WHERE first_name ="${response.employeeName}"`, function(err, res){
+            if (err) throw err;
+            console.log("deleted");
+            connection.end();
+        });
+    });
+
 };
