@@ -17,7 +17,7 @@ connection.connect(err =>{
 
     console.log("connected");
 
-    connection.end();
+    prompts();
 });
 
 
@@ -36,31 +36,31 @@ function prompts (){
 
         switch(data.question) {
             case "Add departments":
-                console.log("0") 
+                addDepartment()
                 break;
 
                 case "Add roles":
-                console.log("1")
+                addRoles()
                 break;
 
                 case "Add employees":
-                console.log("1")
+                addEmployees()
                 break;
 
                 case "View departments":
-                console.log("1")
+                viewDepartment()
                 break;
 
                 case "View roles":
-                console.log("1")
+                viewRole()
                 break;
 
                 case "View employees":
-                console.log("1")
+                viewEmployee()
                 break;
 
-                case "Update employees":
-                console.log("1")
+                case "Update employee":
+                updateEmployeeRole()
                 break;
 
                 case "Update roles":
@@ -72,7 +72,6 @@ function prompts (){
     })
 };
 
-prompts();
 
 
 
@@ -86,12 +85,151 @@ function addDepartment(){
             
         }
 
-    ]).then(function(data){
+    ]).then(function(response){
 
-        connection.query(`INSERT into department (name) VALUES (${data.department})`, function(err, response){
+        connection.query(`INSERT into department (name) VALUES ("${response.department}")`, function(err, response){
             if (err) throw err;
 
+            console.log("added");
+            connection.end()
         })
 
     })
+};
+
+
+function addRoles(){
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the title of the role you would like to add?",
+            name: "roleTitle",
+            
+        },
+
+        {
+            type: "input",
+            message: "What is the salary of the role you would like to add?",
+            name: "roleSalary",
+            
+        },
+
+        
+        {
+            type: "input",
+            message: "What is the department id of the role you would like to add?",
+            name: "departmentId",
+            
+        }
+
+
+    ]).then(function(response){
+
+        connection.query(`INSERT into role (title, salary, department_id) VALUES ("${response.roleTitle}", "${response.roleSalary}", "${response.departmentId}" )`, function(err, response){
+            if (err) throw err;
+
+            console.log("added");
+            connection.end()
+        })
+
+    })
+};
+
+
+
+function addEmployees(){
+
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the first name of the employee you would like to add?",
+            name: "firstName",
+            
+        },
+
+        {
+            type: "input",
+            message: "What is the last name of the employee you would like to add?",
+            name: "lastName",
+            
+        },
+
+        
+        {
+            type: "input",
+            message: "What is the role of the employee you would like to add?",
+            name: "roleId",
+            
+        },
+
+        {
+            type: "input",
+            message: "What is the manager id of the employee you would like to add?",
+            name: "managerId",
+            
+        }
+
+
+    ]).then(function(response){
+
+        connection.query(`INSERT into employee (first_name, last_name, role_id, manager_id) VALUES ("${response.firstName}", "${response.lastName}", "${response.roleId}", "${response.managerId}" )`, function(err, response){
+            if (err) throw err;
+
+            console.log("added");
+            connection.end()
+        })
+
+    })
+};
+
+
+function viewDepartment(){
+
+    connection.query("select * FROM department", function(err, result, fields){
+        if (err) throw err;
+        console.table(result);
+        connection.end()
+    })
+};
+
+
+function viewRole(){
+
+    connection.query("select * FROM role", function(err, result){
+        if (err) throw err;
+        console.table(result);
+        connection.end()
+    })
+};
+
+function viewEmployee(){
+
+    connection.query("select * FROM employee", function(err, result){
+        if (err) throw err;
+        console.table(result);
+        connection.end()
+    })
+};
+
+function updateEmployeeRole(){
+    inquirer.prompt([
+        {
+            type: "input",
+            message: "What is the name of the employee?",
+            name: "employeeName",
+        },
+        {
+            type: "input",
+            message: "What is the new role of the employee?",
+            name: "employeeRole",
+        }
+    ]).then(function(response){
+
+        connection.query(`UPDATE employee SET role_id = "${response.employeeRole}" WHERE first_name = "${response.employeeName}"` , function(err, res){
+            if (err) throw err;
+            console.log("updated");
+            connection.end();
+        });
+    });
 };
