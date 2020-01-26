@@ -124,17 +124,11 @@ function addRoles(){
         },
 
         
-        {
-            type: "input",
-            message: "What is the department id of the role you would like to add?",
-            name: "departmentId",
-            
-        }
 
 
     ]).then(function(response){
 
-        connection.query(`INSERT into role (title, salary, department_id) VALUES ("${response.roleTitle}", "${response.roleSalary}", "${response.departmentId}" )`, function(err, response){
+        connection.query(`INSERT into role (title, salary) VALUES ("${response.roleTitle}", "${response.roleSalary}" )`, function(err, response){
             if (err) throw err;
 
             console.log("added");
@@ -146,8 +140,16 @@ function addRoles(){
 
 
 
+
 function addEmployees(){
 
+  var roleArr = ["manager", "engineer"];
+    connection.query("select * FROM role", function(err, result){
+        if (err) throw err;
+        
+        roleArr = [result.roleTitle];
+    
+    })
     inquirer.prompt([
         {
             type: "input",
@@ -165,23 +167,19 @@ function addEmployees(){
 
         
         {
-            type: "input",
+
+            type: "list",
             message: "What is the role of the employee you would like to add?",
-            name: "roleId",
+            name: "role",
+            choices: [roleArr[1]]
             
         },
 
-        {
-            type: "input",
-            message: "What is the manager id of the employee you would like to add?",
-            name: "managerId",
-            
-        }
 
 
     ]).then(function(response){
 
-        connection.query(`INSERT into employee (first_name, last_name, role_id, manager_id) VALUES ("${response.firstName}", "${response.lastName}", "${response.roleId}", "${response.managerId}" )`, function(err, response){
+        connection.query(`INSERT into employee (first_name, last_name, role) VALUES ("${response.firstName}", "${response.lastName}")`, function(err, response){
             if (err) throw err;
 
             console.log("added");
