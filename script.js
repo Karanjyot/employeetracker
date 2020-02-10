@@ -30,7 +30,7 @@ function prompts (){
             type: "list",
             message: "What would you like to do?",
             name: "question",
-            choices: ["Add departments", "Add roles", "Add employees", "View departments", "View roles", "View employees", "Update employee", "Update roles", "Delete department", "Delete role", "Delete employee"]
+            choices: ["Add departments", "Add roles", "Add employees", "View departments", "View roles", "View employees", "Update employee", "Delete department", "Delete role", "Delete employee"]
         }
     ]).then(function(data){
 
@@ -95,11 +95,11 @@ function addDepartment(){
 
     ]).then(function(response){
 
-        connection.query(`INSERT into department (department_name) VALUES ("${response.department}")`, function(err, response){
+        connection.query(`INSERT into department (name) VALUES ("${response.department}")`, function(err, response){
             if (err) throw err;
 
             console.log("added");
-            connection.end()
+            prompts();
         })
 
     })
@@ -132,7 +132,7 @@ function addRoles(){
             if (err) throw err;
 
             console.log("added");
-            connection.end()
+            prompts()
         })
 
     })
@@ -143,12 +143,18 @@ function addRoles(){
 
 function addEmployees(){
 
-  var roleArr = ["manager", "engineer"];
+
+  var roleArr = [];
     connection.query("select * FROM role", function(err, result){
         if (err) throw err;
         
-        roleArr = [result.roleTitle];
+        for(var i = 0; i<result.length; i++){
+
+             roleArr.push(result[i].title)
+        }
+       
     
+       
     })
     inquirer.prompt([
         {
@@ -171,7 +177,7 @@ function addEmployees(){
             type: "list",
             message: "What is the role of the employee you would like to add?",
             name: "role",
-            choices: [roleArr[1]]
+            choices: roleArr
             
         },
 
@@ -179,11 +185,11 @@ function addEmployees(){
 
     ]).then(function(response){
 
-        connection.query(`INSERT into employee (first_name, last_name, role) VALUES ("${response.firstName}", "${response.lastName}")`, function(err, response){
+        connection.query(`INSERT into employee (first_name, last_name, role) VALUES ("${response.firstName}", "${response.lastName}", "${response.role}" )`, function(err, response){
             if (err) throw err;
 
             console.log("added");
-            connection.end()
+            prompts();
         })
 
     })
@@ -195,7 +201,7 @@ function viewDepartment(){
     connection.query("select * FROM department", function(err, result, fields){
         if (err) throw err;
         console.table(result);
-        connection.end()
+        prompts()
     })
 };
 
@@ -205,7 +211,7 @@ function viewRole(){
     connection.query("select * FROM role", function(err, result){
         if (err) throw err;
         console.table(result);
-        connection.end()
+        prompts()
     })
 };
 
@@ -214,7 +220,7 @@ function viewEmployee(){
     connection.query("select * FROM employee", function(err, result){
         if (err) throw err;
         console.table(result);
-        connection.end()
+        prompts()
     })
 };
 
@@ -232,10 +238,10 @@ function updateEmployeeRole(){
         }
     ]).then(function(response){
 
-        connection.query(`UPDATE employee SET role_id = "${response.employeeRole}" WHERE first_name = "${response.employeeName}"` , function(err, res){
+        connection.query(`UPDATE employee SET role = "${response.employeeRole}" WHERE first_name = "${response.employeeName}"` , function(err, res){
             if (err) throw err;
             console.log("updated");
-            connection.end();
+            prompts();
         });
     });
 };
@@ -251,7 +257,7 @@ function deleteDepartment(){
         }
     ]).then(function(response){
 
-        connection.query(`DELETE FROM department WHERE department_name ="${response.departmentName}"`, function(err, res){
+        connection.query(`DELETE FROM department WHERE name ="${response.departmentName}"`, function(err, res){
             if (err) throw err;
             console.log("{department_name: response.departmentName}");
             console.log({department_name: response.departmentName});
@@ -275,7 +281,7 @@ function deleteRole(){
         connection.query(`DELETE FROM role WHERE title ="${response.roleName}"`, function(err, res){
             if (err) throw err;
             console.log("deleted");
-            connection.end();
+            prompts();
         })
     })
 
@@ -295,7 +301,7 @@ function deleteEmployee(){
         connection.query(`DELETE FROM employee WHERE first_name ="${response.employeeName}"`, function(err, res){
             if (err) throw err;
             console.log("deleted");
-            connection.end();
+            prompts();
         });
     });
 
